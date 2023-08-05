@@ -5,8 +5,6 @@ import (
 	"database/sql/driver"
 	"strings"
 
-	"github.com/olaola-chat/rbp-library/tracer"
-
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/log"
 	"github.com/pkg/errors"
@@ -75,7 +73,7 @@ func (c wrappedConn) Begin() (driver.Tx, error) {
 }
 
 func (c wrappedConn) BeginTx(ctx context.Context, opts driver.TxOptions) (tx driver.Tx, err error) {
-	span, _ := tracer.StartOpentracingSpan(ctx, "sql-tx")
+	span, _ := StartOpentracingSpan(ctx, "sql-tx")
 	if connBeginTx, ok := c.parent.(driver.ConnBeginTx); ok {
 		tx, err = connBeginTx.BeginTx(ctx, opts)
 		if err != nil {
@@ -92,7 +90,7 @@ func (c wrappedConn) PrepareContext(ctx context.Context, query string) (stmt dri
 		if err != nil {
 			return nil, err
 		}
-		span, _ := tracer.StartOpentracingSpan(ctx, "sql-query")
+		span, _ := StartOpentracingSpan(ctx, "sql-query")
 		if span != nil {
 			span.SetTag("db.statement", query)
 		}
