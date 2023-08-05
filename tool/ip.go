@@ -5,7 +5,7 @@ import (
 	"net"
 	"path"
 
-	"banban/library/tool/region"
+	"github.com/olaola-chat/rbp-library/tool/region"
 )
 
 var (

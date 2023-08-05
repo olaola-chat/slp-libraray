@@ -1,7 +1,7 @@
 package tool
 
 import (
-	"banban/library/tool/pinyin"
+	"github.com/olaola-chat/rbp-library/tool/pinyin"
 
 	"path"
 
