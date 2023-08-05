@@ -3,9 +3,12 @@ module github.com/olaola-chat/rbp-library
 go 1.20
 
 require (
+	github.com/deckarep/golang-set v1.8.0
+	github.com/go-redis/redis/extra/rediscmd v0.2.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gogf/gf v1.16.9
+	github.com/gogf/swagger v1.3.0
 	github.com/hashicorp/consul/api v1.24.0
 	github.com/juju/ratelimit v1.0.1
 	github.com/opentracing/opentracing-go v1.1.1-0.20190913142402-a7454ce5950e
@@ -13,6 +16,7 @@ require (
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0
 	github.com/rpcxio/libkv v0.5.0
 	github.com/smallnest/rpcx v0.0.0-00010101000000-000000000000
+	github.com/syyongx/php2go v0.9.8
 	github.com/uber/jaeger-client-go v2.30.0+incompatible
 	github.com/urfave/cli v1.22.14
 	google.golang.org/protobuf v1.31.0

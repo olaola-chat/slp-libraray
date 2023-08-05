@@ -1,19 +1,19 @@
-package server
+package rpc
 
 import (
 	"context"
 	"fmt"
+	"github.com/olaola-chat/rbp-library/env"
+	"github.com/olaola-chat/rbp-library/server/rpc/plugins"
 	"math/rand"
 	"os"
 	"os/signal"
-	"strings"
 	"sync"
 	"syscall"
 	"time"
 
 	"github.com/olaola-chat/rbp-library/acm"
 	"github.com/olaola-chat/rbp-library/loghook"
-	"github.com/olaola-chat/rbp-library/rpc/server/plugins"
 	"github.com/olaola-chat/rbp-library/tool"
 	_ "github.com/olaola-chat/rbp-library/tracer"
 
@@ -42,34 +42,6 @@ func init() {
 		panic(gerror.Wrap(err, "rpc discover config error"))
 	}
 
-}
-
-// IsDev 表明当前系统是不是dev
-// 不要在init初始化函数中使用
-var IsDev bool = false
-var RunMode string = "prod"
-
-func init() {
-	//通过机器来检测是不是alpha，这样来统一所有的配置和部署
-	mode := g.Cfg().GetString("server.RunMode")
-	alphaHosts := g.Cfg().GetStrings("server.AlphaHosts")
-	if alphaHosts != nil && mode == "prod" {
-		host, err := os.Hostname()
-		if err == nil {
-			host = strings.ToLower(host)
-			for _, alpha := range alphaHosts {
-				if host == strings.ToLower(alpha) {
-					//是alpha服务器
-					mode = "alpha"
-				}
-			}
-		}
-	}
-
-	IsDev = mode == "dev" || len(mode) == 0
-	RunMode = mode
-
-	fmt.Println("server run with", RunMode)
 }
 
 // NewServer 创建rpc server服务
@@ -145,7 +117,7 @@ func CreateRpcServer(sCfg *ServerCfg, closed chan bool) {
 		err := rpcServer.RegisterName(
 			sCfg.RegisterName,
 			sCfg.Server(),
-			fmt.Sprintf("group=%s", RunMode),
+			fmt.Sprintf("group=%s", env.RunMode),
 		)
 		if err != nil {
 			panic(err)
