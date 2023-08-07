@@ -61,12 +61,12 @@ func Run(servers []interface{}) {
 	var cmdActionName string
 	var cfgName string
 
-	acm.Init()
-
 	g.Log().SetAsync(true)
 	g.Log().SetHeaderPrint(true)
 	g.Log().SetFlags(glog.F_FILE_SHORT)
 	g.Log().SetStack(false)
+
+	acm.GetAcm()
 
 	ca := cli.NewApp()
 	ca.Name = "banban cli server"

@@ -3,6 +3,7 @@ package rpc
 import (
 	"context"
 	"fmt"
+	"github.com/olaola-chat/rbp-library/acm"
 	"github.com/olaola-chat/rbp-library/env"
 	"github.com/olaola-chat/rbp-library/server/rpc/plugins"
 	"math/rand"
@@ -12,7 +13,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/olaola-chat/rbp-library/acm"
 	"github.com/olaola-chat/rbp-library/loghook"
 	"github.com/olaola-chat/rbp-library/tool"
 	_ "github.com/olaola-chat/rbp-library/tracer"
@@ -178,14 +178,13 @@ func run(name string, servers map[string]*ServerCfg, pwg *sync.WaitGroup) {
 }
 
 func Run(servers map[string]*ServerCfg) {
-	acm.Init()
-
 	g.Log().SetAsync(true)
 	g.Log().SetHeaderPrint(true)
 	g.Log().SetFlags(glog.F_FILE_SHORT)
 	g.Log().SetStack(false)
-
 	g.Log().Info("work begin")
+
+	acm.GetAcm()
 
 	var serviceName string
 	var cfgName string

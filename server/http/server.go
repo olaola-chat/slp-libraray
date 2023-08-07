@@ -14,13 +14,14 @@ import (
 )
 
 func Run(route func(server *ghttp.Server)) {
-	acm.Init()
 
 	g.Log().SetAsync(true)
 	g.Log().SetHeaderPrint(true)
 	g.Log().SetFlags(glog.F_FILE_SHORT)
 	g.Log().SetStack(false)
-	g.Log().Println("work begin")
+	g.Log().Info("work begin")
+
+	acm.GetAcm()
 
 	var cfgName string
 
