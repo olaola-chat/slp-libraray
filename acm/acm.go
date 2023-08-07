@@ -15,6 +15,8 @@ type Acm interface {
 	ListenDir(key string, cb DirCallback) error
 }
 
+// TODO: 待处理问题，key不存在会报错，Dir子key删除无回调
+
 var _acm *acm
 var acmOnce sync.Once
 
