@@ -53,6 +53,11 @@ func (a *acm) ListenDir(key string, cb DirCallback) error {
 }
 
 func (a *acm) init() {
+	a.keys = make(map[string]KeyCallback)
+	a.dirs = make(map[string]DirCallback)
+	a.keyIndex = make(map[string]uint64)
+	a.dirIndex = make(map[string]uint64)
+
 	cfg := &consul.DiscoverConfig{}
 	err := g.Cfg().GetStruct("rpc.discover", cfg)
 	if err != nil {
