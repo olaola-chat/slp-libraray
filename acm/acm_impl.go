@@ -8,6 +8,7 @@ import (
 
 	"github.com/olaola-chat/rbp-library/consul"
 
+	"github.com/gogf/gf/errors/gerror"
 	"github.com/gogf/gf/frame/g"
 	"github.com/hashicorp/consul/api"
 )
@@ -26,18 +27,29 @@ type acm struct {
 	dirIndex map[string]uint64
 }
 
-func (a *acm) ListenKey(key string, cb KeyCallback) {
+func (a *acm) ListenKey(key string, cb KeyCallback) error {
 	a.m.Lock()
 	defer a.m.Unlock()
-
-	a.keys[key] = cb
+	err := a.initFetchKey(key, cb)
+	if err != nil {
+		return err
+	}
+	fullKey := fmt.Sprintf("%s/%s", prefix, key)
+	a.keys[fullKey] = cb
+	return nil
 }
 
-func (a *acm) ListenDir(key string, cb DirCallback) {
+func (a *acm) ListenDir(key string, cb DirCallback) error {
 	a.m.Lock()
 	defer a.m.Unlock()
+	err := a.initFetchDir(key, cb)
+	if err != nil {
+		return err
+	}
 
-	a.dirs[key] = cb
+	fullKey := fmt.Sprintf("%s/%s", prefix, key)
+	a.dirs[fullKey] = cb
+	return nil
 }
 
 func (a *acm) init() {
@@ -124,4 +136,53 @@ func (a *acm) run() {
 		waitIndex = meta.LastIndex
 		a.m.Unlock()
 	}
+}
+
+func (a *acm) initFetchKey(key string, callback KeyCallback) error {
+	fullKey := fmt.Sprintf("%s/%s", prefix, key)
+	pair, meta, err := a.c.KV().Get(fullKey, &api.QueryOptions{})
+	if err != nil {
+		g.Log().Error("acm get", key, "error", err)
+		return err
+	}
+	if pair == nil {
+		g.Log().Error("acm get", key, "not found")
+		return gerror.Newf("key not found %s", fullKey)
+	}
+	g.Log().Info("acm get ok", key, meta.LastIndex)
+	err = callback(string(pair.Value))
+	if err != nil {
+		g.Log().Error("acm get error ", err)
+		return err
+	}
+	a.keyIndex[fullKey] = meta.LastIndex
+
+	return nil
+}
+
+func (a *acm) initFetchDir(dir string, callback DirCallback) error {
+	fullKey := fmt.Sprintf("%s/%s", prefix, dir)
+	pairs, meta, err := a.c.KV().List(fullKey, &api.QueryOptions{})
+	if err != nil {
+		g.Log().Error("acm get error", err)
+		return err
+	}
+	dirData := make(map[string]string)
+	var lastIndex uint64
+	for _, pair := range pairs {
+		key := pair.Key
+		dirData[key] = string(pair.Value)
+		if lastIndex < pair.ModifyIndex {
+			lastIndex = pair.ModifyIndex
+		}
+	}
+
+	g.Log().Info("acm get ok", dir, meta.LastIndex)
+	err = callback(dirData)
+	if err != nil {
+		g.Log().Error("acm get error ", err)
+		return err
+	}
+	a.dirIndex[fullKey] = lastIndex
+	return nil
 }

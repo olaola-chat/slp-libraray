@@ -11,8 +11,8 @@ type KeyCallback func(value string) error
 type DirCallback func(kvs map[string]string) error
 
 type Acm interface {
-	ListenKey(key string, cb KeyCallback)
-	ListenDir(key string, cb DirCallback)
+	ListenKey(key string, cb KeyCallback) error
+	ListenDir(key string, cb DirCallback) error
 }
 
 var _acm *acm
