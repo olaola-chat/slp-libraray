@@ -71,7 +71,7 @@ func init() {
 		panic(err.Error())
 	}
 
-	acm.AddConfig("config.firewall", func(content string) error {
+	acm.GetAcm().ListenKey("config.firewall", func(content string) error {
 		v := &acmFirewallConfig{}
 		err := json.Unmarshal([]byte(content), v)
 		if err != nil {
@@ -87,7 +87,7 @@ func init() {
 		Firewall.config = v
 		Firewall.mu.Unlock()
 		return nil
-	}, true)
+	})
 }
 
 type acmFirewallConfig struct {
