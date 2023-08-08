@@ -1,10 +1,11 @@
 package env
 
 import (
-	"github.com/gogf/gf/frame/g"
 	"os"
 	"strings"
 	"sync"
+
+	"github.com/gogf/gf/frame/g"
 )
 
 type runMode string

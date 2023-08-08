@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/olaola-chat/rbp-library/nginx"
+	"github.com/olaola-chat/rbp-library/consul"
 	"github.com/olaola-chat/rbp-library/session"
 	_ "github.com/olaola-chat/rbp-library/tracer"
 
@@ -46,7 +46,7 @@ func appRun(route func(server *ghttp.Server)) {
 	server.BindHandler("/shutdown", func(r *ghttp.Request) {
 		//todo... 安全验证
 		//先取消注册服务
-		nginx.Nginx.Close()
+		_ = consul.GetNginx().Close()
 		//等一会，其他服务需要时间
 		time.Sleep(time.Second * 3)
 		r.Response.Write("ok")
@@ -60,7 +60,7 @@ func appRun(route func(server *ghttp.Server)) {
 	})
 	server.BindHandler("/unregister", func(r *ghttp.Request) {
 		//先取消注册服务
-		nginx.Nginx.Close()
+		_ = consul.GetNginx().Close()
 		//等一会，其他服务需要时间
 		time.Sleep(time.Second * 3)
 		r.Response.Write("ok")
@@ -97,7 +97,7 @@ func appRun(route func(server *ghttp.Server)) {
 			tags = append(tags, fmt.Sprintf("/%s/", prefix))
 		}
 	}
-	err = nginx.Nginx.Regist(tags)
+	err = consul.GetNginx().Regist(tags)
 	if err != nil {
 		panic(err)
 	}
@@ -105,5 +105,5 @@ func appRun(route func(server *ghttp.Server)) {
 	g.Wait()
 
 	//关闭注册服务
-	nginx.Nginx.Close()
+	_ = consul.GetNginx().Close()
 }
