@@ -129,11 +129,11 @@ func (ng *nginx) Regist(prefixs []string) error {
 	}
 
 	//把mode写入consul，用于前端nginx agent识别机器...
-	mode := env.RunMode
+	mode := env.GetRunMode()
 	tags := []string{}
-	if len(mode) > 0 && mode == "prod" {
+	if mode == env.RUNMODE_PROD {
 		tags = append(tags, "nginx")
-		tags = append(tags, mode)
+		tags = append(tags, string(mode))
 	}
 	for i := 0; i < len(prefixs); i++ {
 		prefix := prefixs[i]

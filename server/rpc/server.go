@@ -117,7 +117,7 @@ func CreateRpcServer(sCfg *ServerCfg, closed chan bool) {
 		err := rpcServer.RegisterName(
 			sCfg.RegisterName,
 			sCfg.Server(),
-			fmt.Sprintf("group=%s", env.RunMode),
+			fmt.Sprintf("group=%s", env.GetRunMode()),
 		)
 		if err != nil {
 			panic(err)
