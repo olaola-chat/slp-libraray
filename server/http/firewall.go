@@ -175,7 +175,7 @@ func (*firewallService) hashTime(t time.Time) int {
 // 客户端时间差的太多的(分析下现在日志，缩小时间判断差值...)
 // todo... 重放攻击
 func (fire *firewallService) sign(r *ghttp.Request) bool {
-	if env.IsDev {
+	if env.IsDev() {
 		return true
 	}
 	//客户端时间差超过28分钟，也要被屏蔽

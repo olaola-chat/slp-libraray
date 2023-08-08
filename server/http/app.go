@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/olaola-chat/rbp-library/consul"
-	"github.com/olaola-chat/rbp-library/session"
 	_ "github.com/olaola-chat/rbp-library/tracer"
 
 	"github.com/gogf/gf/frame/g"
@@ -31,9 +30,9 @@ func appRun(route func(server *ghttp.Server)) {
 	server.SetErrorStack(true)
 	server.SetFileServerEnabled(true)
 	server.SetKeepAlive(true)
-	server.SetSessionIdName("bbsid")
-	server.SetSessionCookieMaxAge(time.Hour * 24)
-	server.SetSessionStorage(session.NewStorageRedisV8())
+	// server.SetSessionIdName("bbsid")
+	// server.SetSessionCookieMaxAge(time.Hour * 24)
+	// server.SetSessionStorage(session.NewStorageRedisV8())
 	server.Plugin(&swagger.Swagger{})
 	// TODO: 支持Swagger Token
 	// server.BindHandler("/swagger/token", api.Debug.Token)
