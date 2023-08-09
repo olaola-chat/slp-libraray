@@ -1,16 +1,17 @@
-package nginx
+package consul
 
 import (
 	"fmt"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/olaola-chat/rbp-library/env"
 	"github.com/olaola-chat/rbp-library/tool"
 
 	"github.com/gogf/gf/errors/gerror"
 	"github.com/gogf/gf/frame/g"
-	consulapi "github.com/hashicorp/consul/api"
+	"github.com/hashicorp/consul/api"
 )
 
 const (
@@ -18,17 +19,20 @@ const (
 	ServiceName = "rbp/nginx"
 )
 
-type discoverConfig struct {
-	Type string
-	Addr []string
-	Path string
+var _nginx *nginx
+var nginxOnce sync.Once
+
+func GetNginx() *nginx {
+	nginxOnce.Do(func() {
+		_nginx = &nginx{}
+		_nginx.init()
+	})
+
+	return _nginx
 }
 
-// Nginx nginx的单例对象
-var Nginx *nginx
-
-func init() {
-	cfg := &discoverConfig{}
+func (ng *nginx) init() {
+	cfg := &DiscoverConfig{}
 	err := g.Cfg().GetStruct("rpc.discover", cfg)
 	if err != nil {
 		panic(err)
@@ -53,17 +57,15 @@ func init() {
 		panic(err)
 	}
 
-	Nginx = &nginx{
-		Ipv4: ipv4,
-		Port: port,
-		Cfg:  cfg,
-	}
+	ng.Ipv4 = ipv4
+	ng.Port = port
+	ng.Cfg = cfg
 }
 
 type nginx struct {
 	Ipv4   string
 	Port   int
-	Cfg    *discoverConfig
+	Cfg    *DiscoverConfig
 	closed bool
 }
 
@@ -129,11 +131,11 @@ func (ng *nginx) Regist(prefixs []string) error {
 	}
 
 	//把mode写入consul，用于前端nginx agent识别机器...
-	mode := env.RunMode
-	tags := []string{}
-	if len(mode) > 0 && mode == "prod" {
+	mode := env.GetRunMode()
+	var tags []string
+	if mode == env.RUNMODE_PROD {
 		tags = append(tags, "nginx")
-		tags = append(tags, mode)
+		tags = append(tags, string(mode))
 	}
 	for i := 0; i < len(prefixs); i++ {
 		prefix := prefixs[i]
@@ -151,7 +153,7 @@ func (ng *nginx) Regist(prefixs []string) error {
 		return err
 	}
 	//创建一个新服务。
-	registration := new(consulapi.AgentServiceRegistration)
+	registration := new(api.AgentServiceRegistration)
 	registration.ID = ng.getID()
 	registration.Name = ServiceName
 	registration.Tags = tags
@@ -159,7 +161,7 @@ func (ng *nginx) Regist(prefixs []string) error {
 	registration.Port = ng.Port
 
 	//增加check。
-	check := new(consulapi.AgentServiceCheck)
+	check := new(api.AgentServiceCheck)
 	check.HTTP = fmt.Sprintf("http://%s:%d%s", registration.Address, registration.Port, "/ping")
 	check.Timeout = "1s"                         //设置超时 1s
 	check.Interval = "3s"                        //设置间隔 5s
@@ -174,13 +176,13 @@ func (ng *nginx) getID() string {
 	return fmt.Sprintf("%s:%d", ng.Ipv4, ng.Port)
 }
 
-func (ng *nginx) getClient() (*consulapi.Client, error) {
+func (ng *nginx) getClient() (*api.Client, error) {
 	return ng.getDiretClient(ng.Cfg.Addr[0])
 }
 
-func (ng *nginx) getDiretClient(ip string) (*consulapi.Client, error) {
-	config := consulapi.DefaultConfig()
+func (ng *nginx) getDiretClient(ip string) (*api.Client, error) {
+	config := api.DefaultConfig()
 	config.Address = ip
 	config.Scheme = "http"
-	return consulapi.NewClient(config)
+	return api.NewClient(config)
 }

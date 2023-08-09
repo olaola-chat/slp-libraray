@@ -1,41 +1,59 @@
-package http
+package middleware
 
 import (
 	"encoding/binary"
-	"encoding/json"
 	"fmt"
 	"net"
+	"net/http"
 	"regexp"
 	"sort"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/olaola-chat/rbp-library/acm"
+	"github.com/gogf/gf/frame/g"
+
 	"github.com/olaola-chat/rbp-library/env"
 	"github.com/olaola-chat/rbp-library/tool"
 
 	mapset "github.com/deckarep/golang-set"
-	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/net/ghttp"
 	"github.com/gogf/gf/util/gconv"
 	"github.com/syyongx/php2go"
 )
 
-// Firewall 导出单例，用于全局计算
-// ip 频率限制
-// 防止回放，防止参数篡改
-// 防止来自机房的请求...
-// ip 屏蔽，country 屏蔽
-// Sql 注入...
-// 定时上报topN Ip
-// 接收任务，屏蔽指定请求
-var Firewall *firewallService
-var dangerRegexp *regexp.Regexp
+var _fire *firewall
+var fireOnce sync.Once
 
-const safeReqSecond = 10
+func Fire(r *ghttp.Request) {
+	fireOnce.Do(func() {
+		_fire = &firewall{}
+		go _fire.init()
+	})
+	if !_fire.add(r) {
+		r.Response.Status = http.StatusNotAcceptable
+		r.Exit()
+		return
+	}
+	r.Middleware.Next()
+}
 
-func init() {
+type firewall struct {
+	fields       []string
+	data         []*map[uint32]uint32
+	replay       []mapset.Set
+	mu           sync.Mutex
+	second       int
+	blockIP      map[string]bool
+	dangerRegexp *regexp.Regexp
+}
+
+const maxReqSecond = 10
+
+// http server启动前执行
+// 新启动一个线程用于接收数据，接收的数据都向这个线程里放，避免多线程之间的各种竞争
+
+func (fire *firewall) init() {
 	keys := sort.StringSlice{
 		"package",
 		"_ipv",
@@ -46,68 +64,27 @@ func init() {
 		"format",
 	}
 	sort.Sort(keys)
-	Firewall = &firewallService{
-		fields: keys,
-		data:   make([]*map[uint32]uint32, 60),
-		replay: make([]mapset.Set, 30),
-		config: &acmFirewallConfig{
-			BlockIP:      []string{},
-			MaxReqSecond: safeReqSecond,
-		},
-		second:  time.Now().Second(),
-		blockIP: make(map[string]bool),
-	}
+	fire.fields = keys
+	fire.data = make([]*map[uint32]uint32, 60)
+	fire.replay = make([]mapset.Set, 30)
+	fire.second = time.Now().Second()
+	fire.blockIP = make(map[string]bool)
+
 	for i := 0; i < 60; i++ {
-		Firewall.data[i] = &map[uint32]uint32{}
+		fire.data[i] = &map[uint32]uint32{}
 	}
 	for i := 0; i < 30; i++ {
 		//生成一个线程安全的set集合
-		Firewall.replay[i] = mapset.NewSet()
+		fire.replay[i] = mapset.NewSet()
 	}
 	str := `(?i)(\b(shell|exec|select|update|delete|insert|trancate|char|chr|substr|ascii|declare|master|drop|execute)\b)`
 	var err error
-	dangerRegexp, err = regexp.Compile(str)
+	fire.dangerRegexp, err = regexp.Compile(str)
 	if err != nil {
-		panic(err.Error())
+		g.Log().Error("danger Regexp error ", err)
+		// panic(err.Error())
 	}
 
-	acm.GetAcm().ListenKey("config.firewall", func(content string) error {
-		v := &acmFirewallConfig{}
-		err := json.Unmarshal([]byte(content), v)
-		if err != nil {
-			g.Log().Println("acm parse cofig.firewall error", err)
-			return err
-		}
-		block := make(map[string]bool)
-		for _, ip := range v.BlockIP {
-			block[ip] = true
-		}
-		Firewall.mu.Lock()
-		Firewall.blockIP = block
-		Firewall.config = v
-		Firewall.mu.Unlock()
-		return nil
-	})
-}
-
-type acmFirewallConfig struct {
-	BlockIP      []string `json:"block_ip"`
-	MaxReqSecond uint32   `json:"max_req_second"`
-}
-
-type firewallService struct {
-	fields  []string
-	data    []*map[uint32]uint32
-	replay  []mapset.Set
-	config  *acmFirewallConfig
-	mu      sync.Mutex
-	second  int
-	blockIP map[string]bool
-}
-
-// http server启动前执行
-// 新启动一个线程用于接收数据，接收的数据都向这个线程里放，避免多线程之间的各种竞争
-func (fire *firewallService) Init() {
 	counter := 0
 	ticker := time.NewTicker(time.Second)
 	for range ticker.C {
@@ -126,7 +103,7 @@ func (fire *firewallService) Init() {
 	}
 }
 
-func (fire *firewallService) Add(r *ghttp.Request) bool {
+func (fire *firewall) add(r *ghttp.Request) bool {
 	addr := r.GetClientIp()
 	if len(addr) > 0 && !tool.IP.IsLanIP(addr) {
 		if _, ok := fire.blockIP[addr]; ok {
@@ -147,7 +124,7 @@ func (fire *firewallService) Add(r *ghttp.Request) bool {
 		res := *fire.data[fire.second]
 		if num, ok := res[ip]; ok {
 			res[ip] = num + 1
-			if fire.config.MaxReqSecond >= safeReqSecond && num+1 > fire.config.MaxReqSecond {
+			if num+1 > maxReqSecond {
 				return false
 			}
 		} else {
@@ -155,17 +132,17 @@ func (fire *firewallService) Add(r *ghttp.Request) bool {
 		}
 	}
 	//检测请求中是否含有危险的词汇
-	if dangerRegexp.Match([]byte(r.URL.RawQuery)) {
+	if fire.dangerRegexp != nil && fire.dangerRegexp.Match([]byte(r.URL.RawQuery)) {
 		return false
 	}
-	if !r.IsFileRequest() && dangerRegexp.Match(r.GetBody()) {
+	if !r.IsFileRequest() && fire.dangerRegexp != nil && fire.dangerRegexp.Match(r.GetBody()) {
 		return false
 	}
 
 	return fire.sign(r)
 }
 
-func (*firewallService) hashTime(t time.Time) int {
+func (*firewall) hashTime(t time.Time) int {
 	return t.Minute() / 2
 }
 
@@ -174,8 +151,8 @@ func (*firewallService) hashTime(t time.Time) int {
 // 要考虑同一个用户有多端登录
 // 客户端时间差的太多的(分析下现在日志，缩小时间判断差值...)
 // todo... 重放攻击
-func (fire *firewallService) sign(r *ghttp.Request) bool {
-	if env.IsDev {
+func (fire *firewall) sign(r *ghttp.Request) bool {
+	if env.IsDev() {
 		return true
 	}
 	//客户端时间差超过28分钟，也要被屏蔽

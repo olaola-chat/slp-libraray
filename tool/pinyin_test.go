@@ -6,7 +6,6 @@ import (
 	"sync"
 	"sync/atomic"
 	"testing"
-	"time"
 )
 
 const (
@@ -18,7 +17,7 @@ func TestPinyin(t *testing.T) {
 	var total int64 = 0
 	var num int64 = 0
 
-	rand.Seed(time.Now().UnixNano())
+	// rand.Seed(time.Now().UnixNano())
 	var max int = rand.Intn(100)
 
 	wg := sync.WaitGroup{}

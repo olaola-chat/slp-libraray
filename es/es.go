@@ -136,21 +136,21 @@ func (c *Client) Get(index, docID string, fields ...[]string) (*GetResponse, err
 
 func (c *Client) Put(index, docID string, data map[string]interface{}) error {
 	res := &PutResponse{}
-	url := fmt.Sprintf("%s/_default/%s", index, docID)
+	url := fmt.Sprintf("%s/default/%s", index, docID)
 	err := c.exec(url, HTTPPost, data, res)
 	return err
 }
 
 func (c *Client) Update(index string, id uint64, data string) error {
 	res := &PutResponse{}
-	url := fmt.Sprintf("%s/_default/%d/_update", index, id)
+	url := fmt.Sprintf("%s/default/%d/_update", index, id)
 	err := c.exec(url, HTTPPost, data, res)
 	return err
 }
 
 func (c *Client) Delete(index string, id uint64) error {
 	res := &PutResponse{}
-	url := fmt.Sprintf("%s/_default/%d", index, id)
+	url := fmt.Sprintf("%s/default/%d", index, id)
 	err := c.exec(url, HTTPDelete, nil, res)
 	return err
 }

@@ -3,15 +3,16 @@ package rpc
 import (
 	"context"
 	"fmt"
-	"github.com/olaola-chat/rbp-library/acm"
-	"github.com/olaola-chat/rbp-library/env"
-	"github.com/olaola-chat/rbp-library/server/rpc/plugins"
 	"math/rand"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/olaola-chat/rbp-library/acm"
+	"github.com/olaola-chat/rbp-library/env"
+	"github.com/olaola-chat/rbp-library/server/rpc/plugins"
 
 	"github.com/olaola-chat/rbp-library/loghook"
 	"github.com/olaola-chat/rbp-library/tool"
@@ -35,7 +36,10 @@ type discoverConfig struct {
 	Path string
 }
 
+var myRand *rand.Rand
+
 func init() {
+	myRand = rand.New(rand.NewSource(time.Now().UnixNano()))
 	config = &discoverConfig{}
 	err := g.Cfg().GetStruct("rpc.discover", config)
 	if err != nil {
@@ -104,8 +108,8 @@ func LocalIPWithAutoPort() string {
 	if err != nil {
 		panic(err)
 	}
-	rand.Seed(time.Now().UnixNano())
-	return fmt.Sprintf("%s:%d", ip, 10000+rand.Int31n(10000))
+	// rand.Seed(time.Now().UnixNano())
+	return fmt.Sprintf("%s:%d", ip, 10000+myRand.Int31n(10000))
 }
 
 func CreateRpcServer(sCfg *ServerCfg, closed chan bool) {
@@ -117,7 +121,7 @@ func CreateRpcServer(sCfg *ServerCfg, closed chan bool) {
 		err := rpcServer.RegisterName(
 			sCfg.RegisterName,
 			sCfg.Server(),
-			fmt.Sprintf("group=%s", env.RunMode),
+			fmt.Sprintf("group=%s", env.GetRunMode()),
 		)
 		if err != nil {
 			panic(err)

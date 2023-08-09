@@ -8,12 +8,12 @@ import (
 
 func main() {
 
-	acm.GetAcm().ListenKey("testkey", func(value string) error {
+	_ = acm.GetAcm().ListenKey("testkey", func(value string) error {
 		g.Log().Info(value)
 		return nil
 	})
 
-	acm.GetAcm().ListenDir("testdir", func(kvs map[string]string) error {
+	_ = acm.GetAcm().ListenDir("testdir", func(kvs map[string]string) error {
 		g.Log().Info(kvs)
 		return nil
 	})
