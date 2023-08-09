@@ -22,8 +22,6 @@ const (
 
 // Run Http服务启动入口
 func appRun(route func(server *ghttp.Server)) {
-	go Firewall.Init()
-
 	server := g.Server()
 	server.SetClientMaxBodySize(1024 * 1024 * 20) //20MB
 	server.SetNameToUriType(ghttp.URI_TYPE_CAMEL)
