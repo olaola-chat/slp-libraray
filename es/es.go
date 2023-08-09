@@ -134,7 +134,7 @@ func (c *Client) Get(index, docID string, fields ...[]string) (*GetResponse, err
 	return res, err
 }
 
-func (c *Client) Create(index, docID string, data map[string]interface{}) error {
+func (c *Client) Put(index, docID string, data map[string]interface{}) error {
 	res := &PutResponse{}
 	url := fmt.Sprintf("%s/_default/%s", index, docID)
 	err := c.exec(url, HTTPPost, data, res)
