@@ -10,9 +10,6 @@ import (
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/frame/gins"
 	"github.com/gogf/gf/util/gconv"
-
-	"github.com/olaola-chat/rbp-library/es/get"
-	"github.com/olaola-chat/rbp-library/es/search"
 )
 
 const (
@@ -20,6 +17,8 @@ const (
 	HTTPGet = "GET"
 	//HTTPPost 定义http post方法
 	HTTPPost = "POST"
+	//HTTPDelete 定义http delete方法
+	HTTPDelete = "DELETE"
 )
 
 const (
@@ -103,16 +102,16 @@ func (c *Client) IntSlice2StringSlice(val []interface{}) []string {
 }
 
 // Search ES search
-func (c *Client) Search(index string, body interface{}) (*search.Response, error) {
-	res := &search.Response{}
+func (c *Client) Search(index string, body interface{}) (*SearchResponse, error) {
+	res := &SearchResponse{}
 	url := fmt.Sprintf("%s/_search", index)
 	err := c.exec(url, HTTPPost, body, res)
 	return res, err
 }
 
 // Mget ES 批量获取文档
-func (c *Client) Mget(index string, ids []string, fields ...[]string) (*get.MResponse, error) {
-	res := &get.MResponse{}
+func (c *Client) Mget(index string, ids []string, fields ...[]string) (*MResponse, error) {
+	res := &MResponse{}
 	if len(ids) == 0 {
 		return res, nil
 	}
@@ -125,14 +124,35 @@ func (c *Client) Mget(index string, ids []string, fields ...[]string) (*get.MRes
 }
 
 // Get ES 获取单个文档
-func (c *Client) Get(index, docID string, fields ...[]string) (*get.Response, error) {
-	res := &get.Response{}
+func (c *Client) Get(index, docID string, fields ...[]string) (*GetResponse, error) {
+	res := &GetResponse{}
 	url := fmt.Sprintf("%s/default/%s", index, docID)
 	if len(fields) > 0 && len(fields[0]) > 0 {
 		url = fmt.Sprintf("%s?_source=%s", url, strings.Join(fields[0], ","))
 	}
 	err := c.execGet(url, res)
 	return res, err
+}
+
+func (c *Client) Create(index, docID string, data map[string]interface{}) error {
+	res := &PutResponse{}
+	url := fmt.Sprintf("%s/_default/%s", index, docID)
+	err := c.exec(url, HTTPPost, data, res)
+	return err
+}
+
+func (c *Client) Update(index string, id uint64, data string) error {
+	res := &PutResponse{}
+	url := fmt.Sprintf("%s/_default/%d/_update", index, id)
+	err := c.exec(url, HTTPPost, data, res)
+	return err
+}
+
+func (c *Client) Delete(index string, id uint64) error {
+	res := &PutResponse{}
+	url := fmt.Sprintf("%s/_default/%d", index, id)
+	err := c.exec(url, HTTPDelete, nil, res)
+	return err
 }
 
 func (c *Client) execGet(url string, pointer interface{}) error {
