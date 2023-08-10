@@ -141,7 +141,7 @@ func (c *Client) Put(index, docID string, data map[string]interface{}) error {
 	return err
 }
 
-func (c *Client) Update(index string, id uint64, data string) error {
+func (c *Client) Update(index string, id uint64, data map[string]interface{}) error {
 	res := &PutResponse{}
 	url := fmt.Sprintf("%s/default/%d/_update", index, id)
 	err := c.exec(url, HTTPPost, data, res)
