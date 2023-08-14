@@ -15,12 +15,12 @@ var ContextSrv = new(contextService)
 
 type contextService struct{}
 
-func (s *contextService) GetUserCtx(ctx context.Context) *Context {
+func (s *contextService) GetUserCtx(ctx context.Context) *ContextUser {
 	value := ctx.Value(ContextUserKey)
 	if value == nil {
 		return nil
 	}
-	if localCtx, ok := value.(*Context); ok {
+	if localCtx, ok := value.(*ContextUser); ok {
 		return localCtx
 	}
 	return nil
