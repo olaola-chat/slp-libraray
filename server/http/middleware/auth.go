@@ -11,14 +11,14 @@ import (
 )
 
 func Auth(r *ghttp.Request) {
-	ctxUser, ok := r.GetCtxVar(ContextUserKey).Interface().(*context2.ContextUser)
+	ctxUser, ok := r.GetCtxVar(context2.ContextUserKey).Interface().(*context2.ContextUser)
 	if !ok {
 		ctxUser = &context2.ContextUser{}
 	}
 	if ctxUser.IsLogined() {
 		r.Middleware.Next()
 	} else {
-		ctxI18n, ok := r.GetCtxVar(ContextI18nKey).Interface().(*i18n.I18n)
+		ctxI18n, ok := r.GetCtxVar(context2.ContextI18nKey).Interface().(*i18n.I18n)
 		if !ok {
 			ctxI18n = i18n.NewI18n()
 		}

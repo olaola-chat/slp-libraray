@@ -47,7 +47,7 @@ func Trace(r *ghttp.Request) {
 			rootSpan.SetTag("http.url", r.RequestURI)
 		}
 
-		ctxUser, ok := r.GetCtxVar(ContextUserKey).Interface().(*context2.ContextUser)
+		ctxUser, ok := r.GetCtxVar(context2.ContextUserKey).Interface().(*context2.ContextUser)
 		if !ok {
 			ctxUser = &context2.ContextUser{}
 		}
