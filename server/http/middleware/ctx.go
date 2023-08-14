@@ -10,9 +10,6 @@ import (
 	"github.com/olaola-chat/rbp-library/server/http/context"
 )
 
-const ContextI18nKey = "ctx18n"
-const ContextUserKey = "ContextUserKey"
-
 type AuthUser struct {
 	UID      uint32
 	Time     uint32
@@ -35,10 +32,10 @@ func NewCtxMiddleware(cb AuthFunc) *ctxMiddleware {
 // Ctx 自定义上下文对象
 func (c *ctxMiddleware) Ctx(r *ghttp.Request) {
 	rbpI18n := i18n2.NewI18n()
-	r.SetCtxVar(ContextI18nKey, rbpI18n)
+	r.SetCtxVar(context.ContextI18nKey, rbpI18n)
 
 	ctxUser := context.NewContextUserFromRequest(r)
-	r.SetCtxVar(ContextUserKey, ctxUser)
+	r.SetCtxVar(context.ContextUserKey, ctxUser)
 
 	//获取用户的token
 	//app放在header里面

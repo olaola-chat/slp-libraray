@@ -1,6 +1,7 @@
 package context
 
 import (
+	"context"
 	"strings"
 
 	"github.com/gogf/gf/net/ghttp"
@@ -9,6 +10,21 @@ import (
 
 	"github.com/olaola-chat/rbp-library/tool"
 )
+
+var ContextSrv = new(contextService)
+
+type contextService struct{}
+
+func (s *contextService) GetUserCtx(ctx context.Context) *Context {
+	value := ctx.Value(ContextUserKey)
+	if value == nil {
+		return nil
+	}
+	if localCtx, ok := value.(*Context); ok {
+		return localCtx
+	}
+	return nil
+}
 
 // ContextUser 在请求上下文中的用户信息
 type ContextUser struct {
