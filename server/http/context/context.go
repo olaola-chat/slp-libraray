@@ -14,3 +14,6 @@ type Context struct {
 	I18n *i18n.I18n
 	Span opentracing.Span
 }
+
+const ContextI18nKey = "ctx18n"
+const ContextUserKey = "ContextUserKey"
