@@ -9,9 +9,9 @@ import (
 	"time"
 )
 
-//1.如果redis里面有，就直接返回结果
-//2.如果redis缓存里面没有，就通过闭包获取结果，并存入redis,再返回
-//3. 如果redis不存在，就将空字符串存入 防止击穿
+// 1.如果redis里面有，就直接返回结果
+// 2.如果redis缓存里面没有，就通过闭包获取结果，并存入redis,再返回
+// 3. 如果redis不存在，就将空字符串存入 防止击穿
 func GetOrSetFunc(ctx context.Context, rds *redis.Client, key string, f func() (bData []byte, err error), duration time.Duration) (data []byte, err error) {
 	v, err := rds.Get(ctx, key).Result()
 	if err != nil && err != redis.Nil {

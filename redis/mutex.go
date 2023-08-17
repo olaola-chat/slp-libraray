@@ -65,7 +65,7 @@ func (m *mutex) LockWithTtl(ctx context.Context, ttl time.Duration) error {
 	return nil
 }
 
-//试图获取锁，没有也不阻塞
+// 试图获取锁，没有也不阻塞
 func (m *mutex) TryLockWithTtl(ctx context.Context, ttl time.Duration) (isSuccess bool, err error) {
 	if ttl <= 0 {
 		ttl = time.Second * 3

@@ -20,7 +20,6 @@ require (
 	github.com/uber/jaeger-client-go v2.30.0+incompatible
 	github.com/urfave/cli v1.22.14
 	google.golang.org/protobuf v1.31.0
-	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -103,6 +102,7 @@ require (
 	golang.org/x/text v0.11.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/ini.v1 v1.42.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
 replace (
