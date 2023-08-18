@@ -124,6 +124,7 @@ func (*slice) UniqueSlice(s1, s2 []uint32) []uint32 {
 	for _, s := range s2 {
 
 		if !m[s] {
+			m[s] = true
 			res = append(res, s)
 		}
 
