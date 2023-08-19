@@ -15,8 +15,10 @@ import (
 	"github.com/olaola-chat/rbp-library/kafka"
 )
 
+type ConsumeConf = kafka.ConsumeConf
+
 func NewWatchWorkers(
-	cfg *kafka.ConsumerConf, count int, tables map[string]Callback) ([]*kafka.Worker, error) {
+	cfg *ConsumerConfig, count int, tables map[string]Callback) ([]*kafka.Worker, error) {
 
 	if count < 1 {
 		count = 1

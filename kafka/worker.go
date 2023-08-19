@@ -9,8 +9,7 @@ import (
 	"github.com/gogf/gf/frame/g"
 )
 
-// ConsumerTopics 消费者参数定义
-type ConsumerTopics struct {
+type ConsumerConf struct {
 	Name      string   //kafka 集群配置名字
 	GroupName string   //消费组名字
 	Topics    []string //对应topic数据
@@ -18,57 +17,50 @@ type ConsumerTopics struct {
 }
 
 // ConsumerConfig 消费者参数定义
-type ConsumerConfig struct {
-	Cfg    *ConsumerTopics
-	Hander ConsumerHander //回调函数
-	Stop   chan bool      //停止通知
-	Wait   *sync.WaitGroup
+type Worker struct {
+	cfg       *ConsumerConf
+	receiveCb ReceiveFunc //回调函数
+	group     sarama.ConsumerGroup
 }
 
 // ConsumerHander 消息回调定义
-type ConsumerHander func(msg *sarama.ConsumerMessage) error
+type ReceiveFunc func(msg *sarama.ConsumerMessage) error
 
 // NewConsumerWorker kafka消费
-func NewConsumerWorker(consumer *ConsumerConfig) {
-	defer (func() {
-		if consumer.Wait != nil {
-			consumer.Wait.Done()
-		}
-	})()
-	cfg, err := GetConfig(consumer.Cfg.Name)
+func NewConsumerWorker(cfg *ConsumerConf, handler ReceiveFunc) (*Worker, error) {
+	conf, err := GetConfig(cfg.Name)
 	if err != nil {
-		panic(err)
+		g.Log().Printf("read kafka config failed, %v", err)
+		return nil, err
 	}
-	version, err := sarama.ParseKafkaVersion(cfg.Version)
+	version, err := sarama.ParseKafkaVersion(conf.Version)
 	if err != nil {
-		panic(err)
+		g.Log().Printf(" sarama.ParseKafkaVersion failed,version:%s, err:%v", conf.Version, err)
+		return nil, err
 	}
 
-	config := sarama.NewConfig()
-	config.Version = version
-	config.Consumer.Return.Errors = true
-	config.Consumer.Offsets.CommitInterval = 1 * time.Second
-	config.Consumer.Offsets.Initial = sarama.OffsetOldest
+	kafkaCfg := sarama.NewConfig()
+	kafkaCfg.Version = version
+	kafkaCfg.Consumer.Return.Errors = true
+	kafkaCfg.Consumer.Offsets.CommitInterval = 1 * time.Second
+	kafkaCfg.Consumer.Offsets.Initial = sarama.OffsetOldest
 
-	group, err := sarama.NewConsumerGroup(
-		cfg.Host,
-		consumer.Cfg.GroupName,
-		config,
-	)
+	group, err := sarama.NewConsumerGroup(conf.Host, cfg.GroupName, kafkaCfg)
 	if err != nil {
-		return
+		g.Log().Printf("sarama.NewConsumerGroup failed, %v", err)
+		return nil, err
 	}
 
-	// Track errors
-	// 这会不会成为一个死的....
-	go func() {
-		for err := range group.Errors() {
-			g.Log().Info("ERROR", err)
-		}
-	}()
+	return &Worker{cfg: cfg, receiveCb: handler, group: group}, nil
+}
 
-	consumerWithHander := Consumer{
-		Hander: consumer.Hander,
+func (w *Worker) Start(stop <-chan bool, wait *sync.WaitGroup) error {
+	if wait != nil {
+		wait.Add(1)
+	}
+
+	consumer := Consumer{
+		Handler: w.receiveCb,
 	}
 
 	closed := false
@@ -77,43 +69,62 @@ func NewConsumerWorker(consumer *ConsumerConfig) {
 			if closed {
 				return
 			}
-			err := group.Consume(context.Background(), consumer.Cfg.Topics, consumerWithHander)
-			g.Log().Info("group.break", err)
+			err := w.group.Consume(context.Background(), w.cfg.Topics, consumer)
+			if err != nil {
+				g.Log().Printf("group.break, %s, %v", w.cfg.GroupName, err)
+			}
 			time.Sleep(time.Second)
 		}
 	}()
-	g.Log().Info("kafka wait for control")
 
-	<-consumer.Stop
-	g.Log().Info("kafka to close")
-	closed = true
-	if err = group.Close(); err != nil {
-		g.Log().Info("Error closing client: %v", err)
-	}
-	g.Log().Info("kafka closed")
+	go func() {
+		defer func() {
+			if wait != nil {
+				wait.Done()
+			}
+		}()
+
+		g.Log().Printf("worker wait for control, %s", w.cfg.GroupName)
+		for {
+			select {
+			case <-stop:
+				g.Log().Printf("close worker, %s", w.cfg.GroupName)
+				closed = true
+				if err := w.group.Close(); err != nil {
+					g.Log().Printf("Error closing client: %v", err)
+				}
+				g.Log().Printf("worker closed, %s", w.cfg.GroupName)
+				return
+			case err := <-w.group.Errors(): // Track errors
+				g.Log().Printf("[ERROR]%s, err:%v", w.cfg.GroupName, err)
+			}
+		}
+	}()
+
+	return nil
 }
 
 // Consumer kafka消费定义
 type Consumer struct {
-	Hander ConsumerHander
+	Handler ReceiveFunc
 }
 
 // Setup kafka连接后回调
 func (serv Consumer) Setup(_ sarama.ConsumerGroupSession) error {
-	g.Log().Info("kafka to Setup")
+	//g.Log().Println("kafka to Setup")
 	return nil
 }
 
 // Cleanup kafka关闭后回调
 func (serv Consumer) Cleanup(_ sarama.ConsumerGroupSession) error {
-	g.Log().Info("kafka to Cleanup")
+	//g.Log().Println("kafka to Cleanup")
 	return nil
 }
 
 // ConsumeClaim kafka消费回调
 func (serv Consumer) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	for msg := range claim.Messages() {
-		err := serv.Hander(msg)
+		err := serv.Handler(msg)
 		if err != nil {
 			return err
 		}
