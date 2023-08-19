@@ -15,10 +15,10 @@ import (
 	"github.com/olaola-chat/rbp-library/kafka"
 )
 
-type ConsumeConf = kafka.ConsumeConf
+type ConsumerConf = kafka.ConsumerConf
 
 func NewWatchWorkers(
-	cfg *ConsumerConfig, count int, tables map[string]Callback) ([]*kafka.Worker, error) {
+	cfg *ConsumerConf, count int, tables map[string]Callback) ([]*kafka.Worker, error) {
 
 	if count < 1 {
 		count = 1
@@ -68,7 +68,7 @@ func RunWorkers(workers []*kafka.Worker) {
 }
 
 type cbWrap struct {
-	tables map[string]binlog.Callback
+	tables map[string]Callback
 }
 
 func (c cbWrap) receiveMsg(msg *sarama.ConsumerMessage) error {
@@ -80,7 +80,7 @@ func (c cbWrap) receiveMsg(msg *sarama.ConsumerMessage) error {
 	kafkaTime := msg.Timestamp.UnixNano()
 	kafkaDur := float64(now-kafkaTime) / 1e6 //kafka到now的时间段
 
-	res, err := binlog.ParseCanalJSON(msg.Value)
+	res, err := ParseCanalJSON(msg.Value)
 	if err != nil {
 		g.Log().Errorf(
 			"watchdb, topic:%s,partition:%d,offset:%d,"+
@@ -124,19 +124,19 @@ func (c cbWrap) receiveMsg(msg *sarama.ConsumerMessage) error {
 	//dealed = true
 
 	switch res.Op {
-	case binlog.CanalWrite:
+	case CanalWrite:
 		values := make([]interface{}, 0, count)
 		for _, v := range res.Data {
 			values = append(values, buildProtoMessage(cb, v))
 		}
 		_ = cb.Inserted(ctx, values, res)
-	case binlog.CanalUpdate:
+	case CanalUpdate:
 		values := make([]interface{}, 0, count)
 		for _, v := range res.Data {
 			values = append(values, buildProtoMessage(cb, v))
 		}
 		_ = cb.Updated(ctx, values, res)
-	case binlog.CanalDelete:
+	case CanalDelete:
 		values := make([]interface{}, 0, count)
 		for _, v := range res.Old {
 			values = append(values, buildProtoMessage(cb, v))
@@ -147,7 +147,7 @@ func (c cbWrap) receiveMsg(msg *sarama.ConsumerMessage) error {
 	return nil
 }
 
-func buildProtoMessage(cb binlog.Callback, data map[string]string) interface{} {
+func buildProtoMessage(cb Callback, data map[string]string) interface{} {
 	val := cb.New()
 	err := gconv.Struct(data, val)
 	if err != nil {
