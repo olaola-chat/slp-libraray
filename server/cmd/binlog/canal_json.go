@@ -1,6 +1,7 @@
-package kafka
+package binlog
 
 import (
+	"context"
 	"encoding/json"
 )
 
@@ -35,8 +36,21 @@ func PaseCanalJSON(data []byte) (*CanalJSON, error) {
 		//兼容
 		if value.Op == CanalDelete && len(value.Old) == 0 {
 			value.Old = value.Data
-			value.Data = []map[string]string{}
 		}
 	}
 	return value, err
+}
+
+type Callback interface {
+	New() interface{}
+	Inserted(ctx context.Context, val []interface{}, res *CanalJSON) error
+	Updated(ctx context.Context, val []interface{}, res *CanalJSON) error
+	Deleted(ctx context.Context, val []interface{}, res *CanalJSON) error
+}
+
+type BinlogCallback interface {
+	New() interface{}
+	Inserted(ctx context.Context, val interface{}) error
+	Updated(ctx context.Context, val, old interface{}) error
+	Deleted(ctx context.Context, val interface{}) error
 }
