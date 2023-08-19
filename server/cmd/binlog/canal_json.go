@@ -28,8 +28,7 @@ type CanalJSON struct {
 	SQLType   map[string]int      `json:"sqlType"`   //经转换处理后的字段类型
 }
 
-// PaseCanalJSON 解析[]byte
-func PaseCanalJSON(data []byte) (*CanalJSON, error) {
+func ParseCanalJSON(data []byte) (*CanalJSON, error) {
 	value := &CanalJSON{}
 	err := json.Unmarshal(data, value)
 	if err == nil {
