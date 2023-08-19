@@ -28,7 +28,8 @@ var fireOnce sync.Once
 func Fire(r *ghttp.Request) {
 	fireOnce.Do(func() {
 		_fire = &firewall{}
-		go _fire.init()
+		_fire.init()
+		go _fire.tick()
 	})
 	if !_fire.add(r) {
 		r.Response.Status = http.StatusNotAcceptable
@@ -84,7 +85,9 @@ func (fire *firewall) init() {
 		g.Log().Error("danger Regexp error ", err)
 		// panic(err.Error())
 	}
+}
 
+func (fire *firewall) tick() {
 	counter := 0
 	ticker := time.NewTicker(time.Second)
 	for range ticker.C {
@@ -152,9 +155,6 @@ func (*firewall) hashTime(t time.Time) int {
 // 客户端时间差的太多的(分析下现在日志，缩小时间判断差值...)
 // todo... 重放攻击
 func (fire *firewall) sign(r *ghttp.Request) bool {
-	if env.IsDev() {
-		return true
-	}
 	//客户端时间差超过28分钟，也要被屏蔽
 	now := time.Now().Unix()
 	timestamp := gconv.Int64(r.GetQuery("_timestamp"))
