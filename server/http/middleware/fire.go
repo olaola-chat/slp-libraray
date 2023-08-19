@@ -13,7 +13,6 @@ import (
 
 	"github.com/gogf/gf/frame/g"
 
-	"github.com/olaola-chat/rbp-library/env"
 	"github.com/olaola-chat/rbp-library/tool"
 
 	mapset "github.com/deckarep/golang-set"
