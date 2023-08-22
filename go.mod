@@ -12,7 +12,7 @@ require (
 	github.com/gogf/swagger v1.3.0
 	github.com/hashicorp/consul/api v1.24.0
 	github.com/juju/ratelimit v1.0.2
-	github.com/olaola-chat/rbp-proto v0.0.0-20230822025000-e442c36276ff
+	github.com/olaola-chat/rbp-proto v0.0.0-20230822072838-096308e79a7e
 	github.com/opentracing/opentracing-go v1.1.1-0.20190913142402-a7454ce5950e
 	github.com/pkg/errors v0.9.1
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475
