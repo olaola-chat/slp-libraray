@@ -393,8 +393,6 @@ github.com/nxadm/tail v1.4.4/go.mod h1:kenIhsEOeOJmVchQTgglprH7qJGnHDVpk1VPCcaMI
 github.com/nxadm/tail v1.4.8 h1:nPr65rt6Y5JFSKQO7qToXr7pePgD6Gwiw05lkbyAQTE=
 github.com/olaola-chat/gf v1.0.1 h1:eCD6++3otivaMyIDavBtCnLl/UkuVhljTZrBnd/F6wU=
 github.com/olaola-chat/gf v1.0.1/go.mod h1:9HBFYWZEUUOPW8+BGXuyFJR95popgn8fbqXK/vk+FCQ=
-github.com/olaola-chat/rbp-proto v0.0.0-20230822025000-e442c36276ff h1:Nb/U5xxxf2QF9tM/kGFcywOpp1VuTMNuychcAYn01Fw=
-github.com/olaola-chat/rbp-proto v0.0.0-20230822025000-e442c36276ff/go.mod h1:PhNFZnK6mAbHtJeG9jkp3eb5n2LmHkp1RM26sU4/G6M=
 github.com/olaola-chat/rbp-proto v0.0.0-20230822072838-096308e79a7e h1:DvI65BmZ0bo0NNJ2PyaIoYh10iCZbqUOFhNwecIShX4=
 github.com/olaola-chat/rbp-proto v0.0.0-20230822072838-096308e79a7e/go.mod h1:PhNFZnK6mAbHtJeG9jkp3eb5n2LmHkp1RM26sU4/G6M=
 github.com/olaola-chat/rbp-rpcx v0.1.0-alpha h1:xb1USyMn5/FRzfRgOnMEQJsP6pL21rmH1BHQKFfCWp4=
