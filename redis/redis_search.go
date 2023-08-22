@@ -12,20 +12,28 @@ import (
 	"github.com/olaola-chat/rbp-library/tool"
 )
 
-var searchRedisClient *redis.Client
+// var searchRedisClient *redis.Client
 
 const (
 	fieldTokenization   = ",.<>{}[]\"':;!@#$%^&*()-+=~|"
 	RedisInstanceSearch = "search"
 )
 
-var RedisSearch = &redisSearch{}
+// var RedisSearch = &redisSearch{}
 
 type redisSearch struct {
+	searchRedisClient *redis.Client
 }
 
-func init() {
-	searchRedisClient = RedisClient(RedisInstanceSearch)
+// func init() {
+// 	searchRedisClient = RedisClient(RedisInstanceSearch)
+// }
+
+func NewRedisSearch() *redisSearch {
+	s := &redisSearch{
+		searchRedisClient: RedisClient(RedisInstanceSearch),
+	}
+	return s
 }
 
 // BuildKeywordBak 对关键词进行
@@ -47,11 +55,11 @@ func EscapeTextFileString(value string) string {
 }
 
 // QueryNoContentBak 不返回具体内容，只返回主键(出去前缀)
-func (*redisSearch) QueryNoContentBak(ctx context.Context, index string, prefixLen int, params []interface{}, reply *room2.RepEsRoomSearchDefault) error {
+func (r *redisSearch) QueryNoContentBak(ctx context.Context, index string, prefixLen int, params []interface{}, reply *room2.RepEsRoomSearchDefault) error {
 	args := []interface{}{"FT.SEARCH", index}
 	args = append(args, params...)
 	args = append(args, "NOCONTENT")
-	result, err := searchRedisClient.Do(ctx, args...).Result()
+	result, err := r.searchRedisClient.Do(ctx, args...).Result()
 	if err != nil {
 		return err
 	}
@@ -68,11 +76,11 @@ func (*redisSearch) QueryNoContentBak(ctx context.Context, index string, prefixL
 }
 
 // QueryWithContentBak 返回所有数据内容，需要自己对返回内容进行处理
-func (*redisSearch) QueryWithContentBak(ctx context.Context, index string, params []interface{}) (uint32, []map[string]string, error) {
+func (r *redisSearch) QueryWithContentBak(ctx context.Context, index string, params []interface{}) (uint32, []map[string]string, error) {
 	args := []interface{}{"FT.SEARCH", index}
 	args = append(args, params...)
 
-	result, err := searchRedisClient.Do(ctx, args...).Result()
+	result, err := r.searchRedisClient.Do(ctx, args...).Result()
 	if err != nil {
 		return 0, nil, err
 	}

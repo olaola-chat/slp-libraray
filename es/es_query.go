@@ -13,16 +13,24 @@ import (
 	"github.com/olaola-chat/rbp-library/redis"
 )
 
-var esClient *Client
+// var esClient *Client
 
-var EsSearch = &esSearch{}
+// var EsSearch = &esSearch{}
 
 type esSearch struct {
+	esClient *Client
 }
 
-func init() {
-	esClient = EsClientInit(EsVpc)
+func NewEsSearch() *esSearch {
+	s := &esSearch{
+		esClient: EsClientInit(EsVpc),
+	}
+	return s
 }
+
+// func init() {
+// 	esClient = EsClientInit(EsVpc)
+// }
 
 // BuildKeyword 关键词搜索
 func BuildKeyword(keyword string) string {
@@ -32,7 +40,7 @@ func BuildKeyword(keyword string) string {
 
 // QueryNoContent 不返回具体内容，只返回主键(出去前缀)
 func (c *esSearch) QueryNoContent(ctx context.Context, index string, params map[string]interface{}, reply *room2.RepEsRoomSearchDefault) error {
-	resp, err := esClient.Search(index, params)
+	resp, err := c.esClient.Search(index, params)
 	if err != nil {
 		return err
 	}
@@ -48,7 +56,7 @@ func (c *esSearch) QueryNoContent(ctx context.Context, index string, params map[
 
 // QueryWithContent 返回所有数据内容，需要自己对返回内容进行处理
 func (c *esSearch) QueryWithContent(ctx context.Context, index string, params map[string]interface{}) (uint32, []map[string]interface{}, error) {
-	resp, err := esClient.Search(index, params)
+	resp, err := c.esClient.Search(index, params)
 	if err != nil {
 		return 0, nil, err
 	}
@@ -98,7 +106,7 @@ func BuildQuery(must []interface{}, limit uint32) map[string]interface{} {
 }
 
 func (c *esSearch) Update(ctx context.Context, index string, primary uint64, params map[string]interface{}) error {
-	return esClient.Update(index, primary, params)
+	return c.esClient.Update(index, primary, params)
 }
 
 func (c *esSearch) SetTerm(key string, value interface{}) g.Map {
