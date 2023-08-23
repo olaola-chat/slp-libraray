@@ -3,8 +3,6 @@ package rocketmq
 import (
 	"context"
 	"fmt"
-	"time"
-
 	rmq_client "github.com/apache/rocketmq-clients/golang/v5"
 	"github.com/apache/rocketmq-clients/golang/v5/credentials"
 	"github.com/gogf/gf/errors/gerror"
