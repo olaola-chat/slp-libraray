@@ -22,12 +22,13 @@ func Auth(r *ghttp.Request) {
 		if !ok {
 			ctxI18n = i18n.NewI18n()
 		}
+		msg := tool.Str.EscapeUnicode(ctxI18n.T("system.need_login"))
 		val, _ := json.Marshal(map[string]interface{}{
 			"status": 403,
-			"msg":    tool.Str.EscapeUnicode(ctxI18n.T("system.need_login")),
+			"msg":    msg,
 		})
 		r.Response.Header().Set("User-Status", string(val))
-		r.Response.WriteExit([]byte(""))
+		r.Response.WriteExit([]byte(msg))
 
 	}
 }
