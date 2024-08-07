@@ -162,11 +162,15 @@ func (fire *firewall) sign(r *ghttp.Request) bool {
 	}
 	//客户端签名不合法，屏蔽
 	querySign := r.GetQuery("_sign")
+	signVer := r.GetQueryInt("_sign_ver")
 	res := []string{}
 	for _, key := range fire.fields {
 		res = append(res, fmt.Sprintf("%s=%s", key, r.GetQuery(key)))
 	}
 	salt := "!rilegoule#"
+	if signVer > 1 {
+		salt = "!caihongmeng#"
+	}
 	// if isMini {
 	// 	salt = "!mini#"
 	// }
@@ -182,7 +186,7 @@ func (fire *firewall) sign(r *ghttp.Request) bool {
 	//按照单个进程每秒2000qps，需要使用100MB+内存
 	//客户端的请求时间能够和服务器校准，那么就会简单很多
 	idx := fire.hashTime(time.Unix(timestamp, 0))
-	fire.replay[idx].Add(querySign)
+	return fire.replay[idx].Add(querySign)
 	//先关闭验证，直接返回通过
-	return true
+	// return true
 }
