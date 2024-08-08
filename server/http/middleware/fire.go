@@ -168,7 +168,7 @@ func (fire *firewall) sign(r *ghttp.Request) bool {
 		res = append(res, fmt.Sprintf("%s=%s", key, r.GetQuery(key)))
 	}
 	salt := "!rilegoule#"
-	if signVer > 1 {
+	if signVer == 1 {
 		salt = "!caihongmeng#"
 	}
 	// if isMini {
