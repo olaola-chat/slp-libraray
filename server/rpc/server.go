@@ -222,7 +222,7 @@ func Run(servers map[string]*ServerCfg) {
 		panic(err)
 	}
 
-	g.Log().SetWriter(loghook.NewLogWriter("RbpRpc." + tool.Str.FirstToUpper(serviceName)))
+	g.Log().SetWriter(loghook.NewLogWriter("SlpRpc." + tool.Str.FirstToUpper(serviceName)))
 
 	var pwg sync.WaitGroup
 	pwg.Add(1)

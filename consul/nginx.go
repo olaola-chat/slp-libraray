@@ -16,7 +16,7 @@ import (
 
 const (
 	//ServiceName 向注册中心注册的服务名字
-	ServiceName = "rbp/nginx"
+	ServiceName = "slp/nginx"
 )
 
 var _nginx *nginx

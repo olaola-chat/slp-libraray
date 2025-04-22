@@ -3,4 +3,4 @@
 	[rpc.discover]
 		Type = "consul"
 		Addr = ["120.26.196.226:6545"]
-		Path = "/rbp"
+		Path = "/slp"

@@ -1,10 +1,12 @@
 package http
 
 import (
+	"os"
+
 	"github.com/gogf/gf/net/ghttp"
+
 	"github.com/olaola-chat/slp-library/acm"
 	"github.com/olaola-chat/slp-library/loghook"
-	"os"
 
 	_ "github.com/olaola-chat/slp-library/tracer"
 
@@ -45,7 +47,7 @@ func Run(route func(server *ghttp.Server)) {
 	}
 
 	//设置日志
-	g.Log().SetWriter(loghook.NewLogWriter("RbpGoHttp"))
+	g.Log().SetWriter(loghook.NewLogWriter("SlpGoHttp"))
 
 	appRun(route)
 }

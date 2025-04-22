@@ -29,7 +29,7 @@ func run(name string, action string, servers []interface{}) {
 			if method.Kind() == reflect.Func {
 				go heartBeat(name, action)
 
-				serverName := "RbpCmd" +
+				serverName := "SlpCmd" +
 					tool.Str.FirstToUpper(name) +
 					tool.Str.FirstToUpper(action)
 				g.Log().SetAsync(true)
@@ -103,7 +103,7 @@ func Run(servers []interface{}) {
 		panic(err)
 	}
 
-	g.Log().SetWriter(loghook.NewLogWriter("RbpGoCmd_" + cmdName + "_" + cmdActionName))
+	g.Log().SetWriter(loghook.NewLogWriter("poCmd_" + cmdName + "_" + cmdActionName))
 
 	run(cmdName, cmdActionName, servers)
 }
