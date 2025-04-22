@@ -8,7 +8,7 @@ import (
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/util/gconv"
 
-	room2 "github.com/olaola-chat/rbp-proto/gen_pb/es/room"
+	room2 "github.com/olaola-chat/slp-proto/gen_pb/es/room"
 
 	"github.com/olaola-chat/slp-library/redis"
 )
