@@ -4,7 +4,7 @@ import (
 	"github.com/gogf/gf/frame/g"
 	"github.com/opentracing/opentracing-go"
 
-	"github.com/olaola-chat/rbp-library/i18n"
+	"github.com/olaola-chat/slp-library/i18n"
 )
 
 // Context 注入到http request里面，用于上下文共享

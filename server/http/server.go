@@ -2,11 +2,11 @@ package http
 
 import (
 	"github.com/gogf/gf/net/ghttp"
-	"github.com/olaola-chat/rbp-library/acm"
-	"github.com/olaola-chat/rbp-library/loghook"
+	"github.com/olaola-chat/slp-library/acm"
+	"github.com/olaola-chat/slp-library/loghook"
 	"os"
 
-	_ "github.com/olaola-chat/rbp-library/tracer"
+	_ "github.com/olaola-chat/slp-library/tracer"
 
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/os/glog"

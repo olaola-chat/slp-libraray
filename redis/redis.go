@@ -13,7 +13,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/opentracing/opentracing-go"
 
-	"github.com/olaola-chat/rbp-library/tracer/wrap"
+	"github.com/olaola-chat/slp-library/tracer/wrap"
 )
 
 type redisConfig struct {

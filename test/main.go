@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/gogf/gf/frame/g"
-	"github.com/olaola-chat/rbp-library/acm"
+	"github.com/olaola-chat/slp-library/acm"
 	"time"
 )
 

@@ -12,7 +12,7 @@ import (
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/util/gconv"
 
-	"github.com/olaola-chat/rbp-library/kafka"
+	"github.com/olaola-chat/slp-library/kafka"
 )
 
 type ConsumerConf = kafka.ConsumerConf

@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/olaola-chat/rbp-library/consul"
-	_ "github.com/olaola-chat/rbp-library/tracer"
+	"github.com/olaola-chat/slp-library/consul"
+	_ "github.com/olaola-chat/slp-library/tracer"
 
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/net/ghttp"

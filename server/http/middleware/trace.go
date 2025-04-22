@@ -9,7 +9,7 @@ import (
 	"github.com/opentracing/opentracing-go/log"
 	"github.com/uber/jaeger-client-go"
 
-	context2 "github.com/olaola-chat/rbp-library/server/http/context"
+	context2 "github.com/olaola-chat/slp-library/server/http/context"
 )
 
 const LogTrackKey = "TraceId"

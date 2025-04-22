@@ -6,8 +6,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/olaola-chat/rbp-library/env"
-	"github.com/olaola-chat/rbp-library/tool"
+	"github.com/olaola-chat/slp-library/env"
+	"github.com/olaola-chat/slp-library/tool"
 
 	"github.com/gogf/gf/errors/gerror"
 	"github.com/gogf/gf/frame/g"

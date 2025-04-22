@@ -1,7 +1,7 @@
 package tool
 
 import (
-	"github.com/olaola-chat/rbp-library/tool/pinyin"
+	"github.com/olaola-chat/slp-library/tool/pinyin"
 
 	"path"
 

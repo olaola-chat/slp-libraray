@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/olaola-chat/rbp-library/acm"
-	"github.com/olaola-chat/rbp-library/loghook"
-	"github.com/olaola-chat/rbp-library/tool"
-	_ "github.com/olaola-chat/rbp-library/tracer"
+	"github.com/olaola-chat/slp-library/acm"
+	"github.com/olaola-chat/slp-library/loghook"
+	"github.com/olaola-chat/slp-library/tool"
+	_ "github.com/olaola-chat/slp-library/tracer"
 
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/os/glog"

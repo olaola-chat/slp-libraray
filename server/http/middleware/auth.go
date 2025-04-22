@@ -3,9 +3,9 @@ package middleware
 import (
 	"encoding/json"
 
-	"github.com/olaola-chat/rbp-library/i18n"
-	context2 "github.com/olaola-chat/rbp-library/server/http/context"
-	"github.com/olaola-chat/rbp-library/tool"
+	"github.com/olaola-chat/slp-library/i18n"
+	context2 "github.com/olaola-chat/slp-library/server/http/context"
+	"github.com/olaola-chat/slp-library/tool"
 
 	"github.com/gogf/gf/net/ghttp"
 )

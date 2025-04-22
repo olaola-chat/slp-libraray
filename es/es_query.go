@@ -10,7 +10,7 @@ import (
 
 	room2 "github.com/olaola-chat/rbp-proto/gen_pb/es/room"
 
-	"github.com/olaola-chat/rbp-library/redis"
+	"github.com/olaola-chat/slp-library/redis"
 )
 
 // var esClient *Client

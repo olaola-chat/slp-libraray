@@ -13,7 +13,7 @@ import (
 
 	"github.com/gogf/gf/frame/g"
 
-	"github.com/olaola-chat/rbp-library/tool"
+	"github.com/olaola-chat/slp-library/tool"
 
 	mapset "github.com/deckarep/golang-set"
 	"github.com/gogf/gf/net/ghttp"

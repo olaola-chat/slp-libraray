@@ -1,4 +1,4 @@
-module github.com/olaola-chat/rbp-library
+module github.com/olaola-chat/slp-library
 
 go 1.20
 

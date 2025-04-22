@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/olaola-chat/rbp-library/tool"
-	"github.com/olaola-chat/rbp-library/tracer/wrap"
+	"github.com/olaola-chat/slp-library/tool"
+	"github.com/olaola-chat/slp-library/tracer/wrap"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/gogf/gf/frame/g"

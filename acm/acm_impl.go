@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/olaola-chat/rbp-library/consul"
+	"github.com/olaola-chat/slp-library/consul"
 
 	"github.com/gogf/gf/errors/gerror"
 	"github.com/gogf/gf/frame/g"

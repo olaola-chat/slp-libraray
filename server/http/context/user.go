@@ -8,7 +8,7 @@ import (
 	"github.com/gogf/gf/text/gregex"
 	"github.com/syyongx/php2go"
 
-	"github.com/olaola-chat/rbp-library/tool"
+	"github.com/olaola-chat/slp-library/tool"
 )
 
 var ContextSrv = new(contextService)

@@ -6,8 +6,8 @@ import (
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/net/ghttp"
 
-	i18n2 "github.com/olaola-chat/rbp-library/i18n"
-	"github.com/olaola-chat/rbp-library/server/http/context"
+	i18n2 "github.com/olaola-chat/slp-library/i18n"
+	"github.com/olaola-chat/slp-library/server/http/context"
 )
 
 type AuthUser struct {
