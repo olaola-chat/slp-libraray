@@ -146,5 +146,5 @@ require (
 
 replace (
 	github.com/gogf/gf => github.com/olaola-chat/gf v1.0.1
-	github.com/smallnest/rpcx => github.com/olaola-chat/rbp-rpcx v0.1.0-alpha
+	github.com/smallnest/rpcx => github.com/olaola-chat/rpcx v0.1.0-alpha
 )
