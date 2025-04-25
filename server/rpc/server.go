@@ -3,7 +3,10 @@ package rpc
 import (
 	"context"
 	"fmt"
+	"github.com/gogf/gf/net/ghttp"
+	"github.com/gogf/gf/util/gconv"
 	"math/rand"
+	"net/http"
 	"os"
 	"os/signal"
 	"sync"
@@ -38,14 +41,63 @@ type discoverConfig struct {
 
 var myRand *rand.Rand
 
+type Server struct {
+	*server.Server
+}
+
+func (s *Server) healthy() (err error) {
+	port := gconv.Int(os.Getenv("PROBE_PORT"))
+	if port > 0 {
+		server := g.Server()
+		server.SetPort(port)
+		server.BindHandler("/ping", func(r *ghttp.Request) {
+			r.Response.Status = http.StatusOK
+			r.Response.WriteExit("pong")
+		})
+		server.BindHandler("/shutdown", func(r *ghttp.Request) {
+			if err := s.Shutdown(r.Context()); err != nil {
+				r.Response.Status = http.StatusBadGateway
+				r.Response.WriteExit(err.Error())
+			}
+			r.Response.Status = http.StatusOK
+			r.Response.WriteExit("shutdown ok!")
+		})
+		server.BindHandler("/unregister", func(r *ghttp.Request) {
+			if err := s.UnregisterAll(); err != nil {
+				r.Response.Status = http.StatusBadGateway
+				r.Response.WriteExit(err.Error())
+			}
+			r.Response.Status = http.StatusOK
+			r.Response.WriteExit("unregister ok!")
+		})
+		go server.Run()
+	}
+	return nil
+}
+func (s *Server) Serve(network, address string) (err error) {
+	if err := s.healthy(); err != nil {
+		return err
+	}
+	if err := s.Server.Serve(network, address); err != nil {
+		return err
+	}
+	return nil
+}
 func init() {
+
 	myRand = rand.New(rand.NewSource(time.Now().UnixNano()))
 	config = &discoverConfig{}
 	err := g.Cfg().GetStruct("rpc.discover", config)
 	if err != nil {
 		panic(gerror.Wrap(err, "rpc discover config error"))
 	}
-
+	if config.Type == "consul" && len(config.Addr) == 0 {
+		consulAgentIp := os.Getenv("CONSUL_AGENT_IP")
+		if consulAgentIp == "" {
+			panic(gerror.Wrap(err, "rpc discover config error"))
+		}
+		config.Addr = []string{fmt.Sprintf("%s:%d", consulAgentIp, 8500)}
+	}
 }
 
 // NewServer 创建rpc server服务
