@@ -13,7 +13,7 @@ require (
 	github.com/gogf/swagger v1.3.0
 	github.com/hashicorp/consul/api v1.24.0
 	github.com/juju/ratelimit v1.0.2
-	github.com/olaola-chat/slp-proto v0.0.0-20250422080318-73a872497c71
+	github.com/olaola-chat/slp-proto v0.0.0
 	github.com/opentracing/opentracing-go v1.1.1-0.20190913142402-a7454ce5950e
 	github.com/pkg/errors v0.9.1
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475
@@ -148,3 +148,5 @@ replace (
 	github.com/gogf/gf => github.com/olaola-chat/gf v1.0.1
 	github.com/smallnest/rpcx => github.com/olaola-chat/rpcx v0.1.0-alpha
 )
+
+replace github.com/olaola-chat/slp-proto v0.0.0 => github.com/olaola-chat/slp-proto v0.0.0-20250422103233-84857c916e48
