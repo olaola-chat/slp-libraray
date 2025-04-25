@@ -2,6 +2,7 @@ package acm
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -62,6 +63,13 @@ func (a *acm) init() {
 	err := g.Cfg().GetStruct("rpc.discover", cfg)
 	if err != nil {
 		panic(err)
+	}
+	if cfg.Type == "consul" && len(cfg.Addr) == 0 {
+		consulAgentIp := os.Getenv("CONSUL_AGENT_IP")
+		if consulAgentIp == "" {
+			panic(gerror.Wrap(err, "rpc discover config error"))
+		}
+		cfg.Addr = []string{fmt.Sprintf("%s:%d", consulAgentIp, 8500)}
 	}
 	client, err := api.NewClient(&api.Config{
 		Address: cfg.Addr[0],

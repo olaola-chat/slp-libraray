@@ -2,6 +2,7 @@ package consul
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -33,9 +34,17 @@ func GetNginx() *nginx {
 
 func (ng *nginx) init() {
 	cfg := &DiscoverConfig{}
-	err := g.Cfg().GetStruct("rpc.discover", cfg)
+	err := g.Cfg().GetStruct("http.discover", cfg)
 	if err != nil {
 		panic(err)
+	}
+
+	if cfg.Type == "consul" && len(cfg.Addr) == 0 {
+		consulAgentIp := os.Getenv("CONSUL_AGENT_IP")
+		if consulAgentIp == "" {
+			panic(gerror.Wrap(err, "rpc discover config error"))
+		}
+		cfg.Addr = []string{fmt.Sprintf("%s:%d", consulAgentIp, 8500)}
 	}
 
 	addr := g.Cfg().GetString("server.Address")
