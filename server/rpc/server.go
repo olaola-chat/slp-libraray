@@ -101,7 +101,7 @@ func init() {
 }
 
 // NewServer 创建rpc server服务
-func NewServer(addr string, limit ...int64) *server.Server {
+func NewServer(addr string, limit ...int64) *Server {
 	fmt.Println("NewServer", addr, config.Type, config.Addr, config.Path)
 	rpcServer := server.NewServer(
 		server.WithReadTimeout(time.Second*3),
@@ -151,7 +151,7 @@ func NewServer(addr string, limit ...int64) *server.Server {
 		panic(gerror.Newf("error discover type %s", config.Type))
 	}
 
-	return rpcServer
+	return &Server{rpcServer}
 }
 
 // LocalIPWithPort 自动生成ip:port
@@ -165,7 +165,7 @@ func LocalIPWithAutoPort() string {
 }
 
 func CreateRpcServer(sCfg *ServerCfg, closed chan bool) {
-	var rpcServer *server.Server
+	var rpcServer *Server
 	go func() {
 		addr := LocalIPWithAutoPort()
 		rpcServer = NewServer(addr, 20000)
