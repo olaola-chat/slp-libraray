@@ -23,7 +23,8 @@ func init() {
 		//enpoitURL = "http://tracing-analysis-dc-hz.aliyuncs.com/adapt_ik4j6rki2p@87bb7ef3b9d9545_ik4j6rki2p@53df7ad2afe8301/api/traces"
 		enpoitURL = "http://192.168.11.46:14268/api/traces?format=jaeger.thrift"
 	} else {
-		enpoitURL = "http://10.0.72.144:6834/api/traces?format=jaeger.thrift"
+		//enpoitURL = "http://10.0.72.144:6834/api/traces?format=jaeger.thrift"
+		enpoitURL = "http://tracing-analysis-dc-hz-internal.aliyuncs.com/adapt_inuwvokay3@a31ad55807332dd_inuwvokay3@53df7ad2afe8301/api/traces"
 	}
 	ip, err := tool.IP.LocalIPv4s()
 	if err != nil {
